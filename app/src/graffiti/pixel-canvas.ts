@@ -42,6 +42,11 @@ export class PixelCanvas {
     if (this.history.length > this.maxHistory) this.history.shift();
   }
 
+  /** Use `history` as the undo stack from now on (the array is kept and mutated in place, so the editor can hold one per photo). */
+  useHistory(history: ImageData[]): void {
+    this.history = history;
+  }
+
   undo(): boolean {
     const previous = this.history.pop();
     if (previous) this.ctx.putImageData(previous, 0, 0);

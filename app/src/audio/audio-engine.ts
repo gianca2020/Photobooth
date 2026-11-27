@@ -38,11 +38,11 @@ export function track(node: AudioScheduledSourceNode): void {
   node.addEventListener('ended', () => active.delete(node));
 }
 
-/** Play a pre-rendered mono buffer at its own sample rate. */
-export function playSamples(samples: Float32Array, sampleRate: number): void {
-  if (!enabled) return;
+/** Play a pre-rendered mono buffer at its own sample rate. Returns the playing node (null if muted/unavailable) so the caller can stop it. */
+export function playSamples(samples: Float32Array, sampleRate: number): AudioBufferSourceNode | null {
+  if (!enabled) return null;
   const audio = getContext();
-  if (!audio) return;
+  if (!audio) return null;
   try {
     const buffer = audio.createBuffer(1, samples.length, sampleRate);
     buffer.getChannelData(0).set(samples);
@@ -51,7 +51,10 @@ export function playSamples(samples: Float32Array, sampleRate: number): void {
     node.connect(audio.destination);
     track(node);
     node.start();
-  } catch { /* audio is a nicety, never fatal */ }
+    return node;
+  } catch {
+    return null; // audio is a nicety, never fatal
+  }
 }
 
 // Phones suspend the context when the page is hidden; wake it when the user returns.

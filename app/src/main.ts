@@ -2,6 +2,7 @@ import { register, go, suspend, currentScene } from './app/router';
 import { resetSession, session } from './app/state';
 import { coinScene } from './scenes/coin';
 import { cameraScene } from './scenes/camera';
+import { revealScene } from './scenes/reveal';
 import { guestsScene } from './scenes/guests';
 import { runScene } from './scenes/run';
 import { welcomeScene } from './scenes/welcome';
@@ -18,6 +19,7 @@ register(0, welcomeScene);
 register(1, guestsScene);
 register(2, runScene);
 register(3, cameraScene);
+register(4, revealScene);
 
 buildProgress((scene) => go(scene));
 wireHeader();
