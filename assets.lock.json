@@ -1,0 +1,354 @@
+{
+  "art/arcade-camera.png": {
+    "md5": "62d2922aa6771e0c4e2282cf5b0dfdd4",
+    "sha256": "2d710130bc1746f1db2f1fa943c4dbbb91c4251ac81fdcc4b0d1933e6816c1a8",
+    "size": 1401,
+    "width": 256,
+    "height": 60,
+    "sourceOffset": 41545
+  },
+  "art/doodle-frame.png": {
+    "md5": "4efbbcca84ad5f7a9d81a36d0c14848d",
+    "sha256": "592e43c59fbc4e73a4c1258762fbda4c5b840e8318491d2d26b263f8bcb322e9",
+    "size": 721,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 46506
+  },
+  "art/dispenser.png": {
+    "md5": "09146095d6e8a48116f93bc786a897d6",
+    "sha256": "8610f7f0c295ac272da6f7b5040d8c4eccbdd606d86b9bf49d9a65819ab49e13",
+    "size": 2027,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 70128
+  },
+  "art/envelope.png": {
+    "md5": "0a7d41cb36d1d5d1012be6652c2f1535",
+    "sha256": "ad024d831ca8d3f12521c23b35c3b21f853e4408f5e9f33f737a18da545579dd",
+    "size": 1612,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 95785
+  },
+  "art/finished-envelope.png": {
+    "duplicateOf": "art/envelope.png",
+    "md5": "0a7d41cb36d1d5d1012be6652c2f1535",
+    "sourceOffset": 98844
+  },
+  "art/guests/guests-1.png": {
+    "md5": "4460451dda075ad8683c217c69e0db71",
+    "sha256": "85a00941944f853202420daaff71ad5b1d948af5a1e68bd0ba435b4f57aca9af",
+    "size": 3274,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 101770
+  },
+  "art/guests/guests-2.png": {
+    "md5": "680b06b6203908b02fd4f2baf4a9217f",
+    "sha256": "0f2539a2e4764e335bdca5c19e13ccbbeef02a73d650cbfe7c179771df53e7b1",
+    "size": 4613,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 106163
+  },
+  "art/guests/guests-3.png": {
+    "md5": "2eee091feadb70f8882f0ae15636c697",
+    "sha256": "393c65c1a88493742f1e52db74cb9ff876566721b6b1ffd68348257c390debdd",
+    "size": 4703,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 112340
+  },
+  "art/guests/guests-4.png": {
+    "md5": "99e59c61eefa6a6ba800c3cd109a85a3",
+    "sha256": "13894b3a2accdc78eeddd3b468c35da41bda0fa6277a86d00c570a34c2d8e7d9",
+    "size": 5793,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 118637
+  },
+  "audio/guest-pop.wav": {
+    "md5": "8c7724d9f70e7ca99128bf2e32728259",
+    "sha256": "8808ea3764781dddf22ed3f2eff968f7d2392f6c3aa2ccab1cbe8b464eef3048",
+    "size": 61484,
+    "sourceOffset": 126413
+  },
+  "art/run/booth.png": {
+    "md5": "9b98a86dbd6d78c79e1997a22bf262b5",
+    "sha256": "2467ac67dce5dc7c677bfb30a3a43dc7a6ef9fb79514c432a9beb70596de00a5",
+    "size": 1666,
+    "width": 160,
+    "height": 120,
+    "sourceOffset": 211870
+  },
+  "art/run/booth-open.png": {
+    "md5": "89dd12991645dc4b198dce9148de1232",
+    "sha256": "8069e86aed701c57d81ee6b6230c734e3c8db1686577f37ee01395ec73cbbb75",
+    "size": 1598,
+    "width": 160,
+    "height": 120,
+    "sourceOffset": 214126
+  },
+  "art/run/runner-1.png": {
+    "md5": "1233ed898ede63207215703588b863dd",
+    "sha256": "9dafaa6c542b2c134a736d734494d977ae15a2fc6256ea2d2cf4069611b13600",
+    "size": 324,
+    "width": 39,
+    "height": 32,
+    "sourceOffset": 216294
+  },
+  "art/run/runner-2.png": {
+    "md5": "f11f741c303f7674b5c09067259f1ad5",
+    "sha256": "6f443afc993f9987f2269c66bcb933212c9c686eafb67c8a70b3a27a4ef6ff08",
+    "size": 370,
+    "width": 40,
+    "height": 32,
+    "sourceOffset": 216751
+  },
+  "art/run/runner-3.png": {
+    "md5": "75e039fb2007f706c72af4816b35ec78",
+    "sha256": "987aa07fb151d3dd1ee0928d5233d8a41400ea0333932c5b768748012a0d59b3",
+    "size": 235,
+    "width": 25,
+    "height": 25,
+    "sourceOffset": 217272
+  },
+  "art/run/runner-4.png": {
+    "md5": "9d91f67b2f13a3495075f7071bd8c298",
+    "sha256": "684f794615f983382fb9d4c2642e60d41829705a7d56fdcc368326c1b0da0ac3",
+    "size": 290,
+    "width": 36,
+    "height": 25,
+    "sourceOffset": 217613
+  },
+  "art/demo/demo-1-0.png": {
+    "md5": "19f7f7ee3fb756c4ecf381546c7e372c",
+    "sha256": "913daed8c0925598841a1a0619f2c6cc7012dea7f627924cf2a6b9054bce0ee6",
+    "size": 3444,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 223283
+  },
+  "art/demo/demo-1-1.png": {
+    "md5": "c6be2f85ffcdd5f48b09f8b3c71894b5",
+    "sha256": "722510dd593225bc07e67af640b20c0e34db5d5673f6e016939a3f4694881574",
+    "size": 3740,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 227901
+  },
+  "art/demo/demo-1-2.png": {
+    "md5": "1ff7ca303c65275f50ef2cf0b7ad55d6",
+    "sha256": "8b8303ed5dd30230f5ab2089297605a4f5943fb965c6469a373b8ed819632745",
+    "size": 3809,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 232915
+  },
+  "art/demo/demo-1-3.png": {
+    "md5": "88b0f1bcc93253564fc4180f29edda76",
+    "sha256": "a99e4b1e3377403bd1f691cedbe5f8c3f7c66a8bdf4ddb7ccdd64b6a31667dc5",
+    "size": 3642,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 238021
+  },
+  "art/demo/demo-2-0.png": {
+    "md5": "1196ec6eb81a638149abeadb4b83cec2",
+    "sha256": "7cfd5c8e0f8db6fc7295ca056f0c3ee29bf51fc43e60df49b2c47747f8f73c60",
+    "size": 4724,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 242905
+  },
+  "art/demo/demo-2-1.png": {
+    "md5": "981146f82c2039e6ed2c95ae1028eda1",
+    "sha256": "99544e6b33fd129380feff1a05d6876f158afdea15178468412425606a185bc0",
+    "size": 5129,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 249231
+  },
+  "art/demo/demo-2-2.png": {
+    "md5": "ef05b31a3cfdbb461098dea7f53febfd",
+    "sha256": "e87af6cae7e4ff26dfa8ea1b51826abf889ec63b002a09fb1045103c9525e982",
+    "size": 5104,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 256097
+  },
+  "art/demo/demo-2-3.png": {
+    "md5": "1007935ff1f4ed701ee0586654990e00",
+    "sha256": "76856a42f54fa2c9a402ed8debe1793bd666e78544ed42a4eac75b0eac4629e4",
+    "size": 4934,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 262931
+  },
+  "art/demo/demo-3-0.png": {
+    "md5": "53845f1efdd2820ccf09aff167f87408",
+    "sha256": "1df53282e04555672ae27dffcee0052e96fca441e5b55fda60222274f1cc5260",
+    "size": 4847,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 269539
+  },
+  "art/demo/demo-3-1.png": {
+    "md5": "81f4ca25edfb51a349ee676c1b71cb58",
+    "sha256": "f39ad980af2028645405124e4e0ee0d3902290c08137497015042bca11a38c85",
+    "size": 5090,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 276029
+  },
+  "art/demo/demo-3-2.png": {
+    "md5": "b26a6dd600906dfc9995c4cc95ab6977",
+    "sha256": "da2eda8a83a07cc82dd50f2ce5da39be4bc839efddc313ef390f6974aedeabd7",
+    "size": 5130,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 282843
+  },
+  "art/demo/demo-3-3.png": {
+    "md5": "2c649a2106045e05ff1573c526387d5f",
+    "sha256": "902aa604ee9cd57128ac8cccabf02f0381fe46d6ce21a1adaf8c00e10142d86d",
+    "size": 5062,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 289709
+  },
+  "art/demo/demo-4-0.png": {
+    "md5": "db0034a9004a89df3d6f2bcb1253d012",
+    "sha256": "d565bf55187201e5ff41b79c30f80e6a9da6a137009e7c524a926384e5630ed7",
+    "size": 5854,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 296489
+  },
+  "art/demo/demo-4-1.png": {
+    "md5": "ced6a0fefe55474644c3aafc5e9516d6",
+    "sha256": "33760e269d3ec91cbf8a53dec7b1504171f1d1768e45632c7b3f4a1c57536baf",
+    "size": 6100,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 304323
+  },
+  "art/demo/demo-4-2.png": {
+    "md5": "6534a0d40d6bd64361bd1de025208fe4",
+    "sha256": "8ec0d9a8f33571826f1fee90291ab3328a2c22e2c73bccd59c890d6ccec532d2",
+    "size": 6211,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 312485
+  },
+  "art/demo/demo-4-3.png": {
+    "md5": "c0d4bc12e267cbaccc6ae7272a292cf9",
+    "sha256": "7cb46708e9f33108d11f4e32d1a76bf2a7b207689a2aa5f046d41dcb0fd30884",
+    "size": 6065,
+    "width": 256,
+    "height": 192,
+    "sourceOffset": 320795
+  },
+  "art/frame-asset.png": {
+    "duplicateOf": "art/doodle-frame.png",
+    "md5": "4efbbcca84ad5f7a9d81a36d0c14848d",
+    "sourceOffset": 329047
+  },
+  "art/coin-sheet.png": {
+    "md5": "40bef031db8a95ae0e91d23a86130d22",
+    "sha256": "9ef5d534a4ab9f316cc4912ebeddcc0b003d309318ded2c79f16799e316d8a6a",
+    "size": 33292,
+    "width": 1280,
+    "height": 1920,
+    "sourceOffset": 363492
+  },
+  "art/flash/mask-0.png": {
+    "md5": "c27e38186284bc455d12b56d78266286",
+    "sha256": "78597adf71848206c8b73f0be8fce258a567616f23a7c4faab67a5eee3cb0a68",
+    "size": 110,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 407997
+  },
+  "art/flash/mask-1.png": {
+    "md5": "e1ed7de2ff0a61d7ae00de1ebb155043",
+    "sha256": "86dac6663bc666c037b877a5ea6d1c302333716379da83ffb2b8ef81ccd3e1ca",
+    "size": 112,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 408171
+  },
+  "art/flash/mask-2.png": {
+    "md5": "8c05f6a74738d672f532eb7430eee707",
+    "sha256": "e78d0d8df9b8db8da7394e6013fad7ed30b0857e50f686eff06f18aa4ff0ce42",
+    "size": 107,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 408349
+  },
+  "art/flash/mask-3.png": {
+    "md5": "17dbcbff8101cbdbb3799d5b35946656",
+    "sha256": "0b9cb8c718da65fe70074d5e76095a3c55f56de484eb48e27329da31acb14d8a",
+    "size": 114,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 408519
+  },
+  "art/flash/mask-4.png": {
+    "md5": "86ba23d5153adc29a183c1baa4efd692",
+    "sha256": "01def524f739639f1edd06f23b0bdbe5e858f39abd7689540fe4e4e50219d838",
+    "size": 93,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 408697
+  },
+  "art/flash/mask-5.png": {
+    "md5": "5b9fd097c86b1d408f35cd99d0117c1f",
+    "sha256": "e0b072754ec7a33c6d7636c93ba7e18faedda9e39a0e1d074105ee246377d4ea",
+    "size": 113,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 408847
+  },
+  "art/flash/mask-6.png": {
+    "md5": "6aee0bd30b2ce46181f9204b1c292270",
+    "sha256": "90a757135ff116d3eaf9985bbd4e5406e648181c294c936d22032138f51c0b63",
+    "size": 109,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 409025
+  },
+  "art/flash/mask-7.png": {
+    "md5": "2625d0df00704a19a6fda3985bd36df6",
+    "sha256": "6de2e35cb16e8eff819b0399039fbe803bcd1e42438daa75085877c8780911a8",
+    "size": 104,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 409199
+  },
+  "art/flash/mask-8.png": {
+    "md5": "000f975727329e3bd144372ca30f972d",
+    "sha256": "61632d1aa8cac258046e3e08e883effa14ec8fb95c6ed687e9a2bdb1d4e06b10",
+    "size": 104,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 409365
+  },
+  "art/flash/mask-9.png": {
+    "md5": "82277b1a020f2d139d25e5a5100897ed",
+    "sha256": "5615945ca1e73ad04284ff9a4c77be714196e802266569c804148f6b00936e53",
+    "size": 78,
+    "width": 8,
+    "height": 8,
+    "sourceOffset": 409531
+  },
+  "art/welcome-sheet.png": {
+    "md5": "6ef41f2c86ec451331fd459dfb45c0e6",
+    "sha256": "f35dc96be08638c1d57367f4a270f8d36abf08925d443945dfd1ab87d8bc0694",
+    "size": 46600,
+    "width": 1280,
+    "height": 3072,
+    "sourceOffset": 411610
+  }
+}

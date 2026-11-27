@@ -1,0 +1,3 @@
+/* Production-only rules layered on the verbatim Draft 27 CSS. */
+/* Prototype chrome (scene dots, back link, DRAFT tag) is hidden unless the URL has ?debug. */
+body:not(.debug) .footer{display:none}

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run assets:check
+      - run: npm run build
+      - name: Validate Cloudflare config (dry run, nothing is deployed)
+        run: npx wrangler deploy --dry-run
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+      - run: npx playwright install --with-deps chromium
+      # Text rendering differs between macOS and Linux, so compare against Draft 27 as rendered
+      # on this same runner rather than against screenshots committed from a Mac.
+      - name: Capture Draft 27 reference on this runner
+        run: node tools/capture-reference.mjs tests/visual/baseline-ci
+      - name: Visual parity vs Draft 27
+        run: npx playwright test
+        env:
+          BASELINE_DIR: tests/visual/baseline-ci
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diffs
+          path: |
+            test-results/
+            tests/visual/baseline-ci/
+          retention-days: 7

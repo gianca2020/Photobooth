@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "photobooth",
+  "compatibility_date": "2026-11-26",
+  // Assets-only Worker: serves the Vite build. No server code until/unless an API route is added.
+  "assets": {
+    "directory": "./dist"
+  },
+  // Wrangler builds dist/ itself, so Cloudflare builds work even if the dashboard build command is empty.
+  "build": { "command": "npm run build" },
+  // Required by `wrangler preview`, which Cloudflare runs for pull-request branches. Empty is fine:
+  // assets and compatibility settings stay at the top level.
+  "previews": {}
+}
