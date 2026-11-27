@@ -1,2 +1,8 @@
 .DS_Store
 design-process/drafts/
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+test-results/
+playwright-report/
