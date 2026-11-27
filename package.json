@@ -10,13 +10,19 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "assets:check": "node tools/extract-assets.mjs --check"
+    "assets:check": "node tools/extract-assets.mjs --check",
+    "cf:dev": "npm run build && wrangler dev --port 8788",
+    "cf:dry-run": "npm run build && wrangler deploy --dry-run"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.11",
     "typescript": "^7.0.2",
     "vite": "^8.4.0",
-    "vitest": "^4.1.12"
+    "vitest": "^4.1.12",
+    "wrangler": "^4.168.0"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }

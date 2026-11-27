@@ -24,6 +24,10 @@ jobs:
       - run: npm test
       - run: npm run assets:check
       - run: npm run build
+      - name: Validate Cloudflare config (dry run, nothing is deployed)
+        run: npx wrangler deploy --dry-run
+        env:
+          WRANGLER_SEND_METRICS: 'false'
       - run: npx playwright install --with-deps chromium
       # Text rendering differs between macOS and Linux, so compare against Draft 27 as rendered
       # on this same runner rather than against screenshots committed from a Mac.
