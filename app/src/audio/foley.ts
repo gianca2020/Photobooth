@@ -1,9 +1,16 @@
 // Playback of Draft 27's synthesized effects (sample math lives in render.ts).
 import { getContext, isEnabled, playSamples, track } from './audio-engine';
-import { RATE, renderCoin, renderOpening, type CoinKind, type OpeningKind } from './render';
+import { RATE, renderCoin, renderOpening, renderPrintFoley, type CoinKind, type OpeningKind } from './render';
 
-export const coinSound = (kind: CoinKind): void => playSamples(renderCoin(kind), RATE);
-export const openingSound = (kind: OpeningKind): void => playSamples(renderOpening(kind), RATE);
+export const coinSound = (kind: CoinKind): void => void playSamples(renderCoin(kind), RATE);
+/** The dispenser's print/drop foley. Returns a function that stops it (leaving the scene, retaking). */
+export function printFoley(): () => void {
+  const node = playSamples(renderPrintFoley(), RATE);
+  return () => {
+    try { node?.stop(); } catch { /* already finished */ }
+  };
+}
+export const openingSound = (kind: OpeningKind): void => void playSamples(renderOpening(kind), RATE);
 
 /** UI blips: a short swept oscillator ('pop' by default, 'slide' between scenes, 'shutter'). */
 export function sfx(kind: 'pop' | 'slide' | 'shutter' = 'pop'): void {

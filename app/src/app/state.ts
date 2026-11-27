@@ -8,12 +8,16 @@ export interface Photo {
   url: string;
 }
 
+export type PhotoFormat = 'strip' | 'grid';
+
 export interface Session {
   count: number;
   names: string[];
   lens: LensId;
   lensChoice: Record<VariantLens, string>;
   frameOn: boolean;
+  /** Layout of the finished photos: the 4-strip or the 2x2 grid. */
+  format: PhotoFormat;
   /** One entry per pose; null if a frame could not be captured (callers fall back to the demo art). */
   shots: (Photo | null)[];
 }
@@ -26,6 +30,7 @@ export const session: Session = {
   lens: 'classic',
   lensChoice: freshChoice(),
   frameOn: false,
+  format: 'strip',
   shots: [],
 };
 
@@ -41,4 +46,5 @@ export function resetSession(): void {
   session.lens = 'classic';
   session.lensChoice = freshChoice();
   session.frameOn = false;
+  session.format = 'strip';
 }
