@@ -1,4 +1,5 @@
 import { register, go, suspend, currentScene } from './app/router';
+import { preloadArt } from './assets/preload';
 import { resetSession, session } from './app/state';
 import { coinScene } from './scenes/coin';
 import { cameraScene } from './scenes/camera';
@@ -31,4 +32,5 @@ $('back').onclick = () => go(currentScene() - 1);
 window.addEventListener('pagehide', suspend);
 window.addEventListener('pageshow', (e) => { if (e.persisted) go(currentScene(), false); });
 
+preloadArt();
 go(-1, false);
