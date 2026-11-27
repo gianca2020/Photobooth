@@ -109,6 +109,19 @@ test('tapping places a face manually; "Auto faces" clears it', async ({ page }) 
   await expect(page.locator('#filter-note')).not.toContainText('Manual placement');
 });
 
+test('tapping the viewfinder places no face while live graffiti is on (it draws instead)', async ({ page }) => {
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('[data-filter="mischief"]');
+  await page.click('#live-toggle');
+  await page.locator('#s3 .viewfinder').click({ position: { x: 200, y: 150 } });
+  await expect(page.locator('#filter-note')).not.toContainText('Manual placement');
+  await page.click('#live-toggle'); // graffiti off: tapping aims again
+  await page.locator('#s3 .viewfinder').click({ position: { x: 200, y: 150 } });
+  await expect(page.locator('#filter-note')).toContainText('Manual placement');
+});
+
 test('a live capture produces four 960x720 photos', async ({ page }) => {
   await open(page);
   await goCamera(page);
