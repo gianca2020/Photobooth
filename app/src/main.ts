@@ -1,13 +1,21 @@
 import { register, go, suspend, currentScene } from './app/router';
+import { session } from './app/state';
 import { coinScene } from './scenes/coin';
+import { guestsScene } from './scenes/guests';
+import { runScene } from './scenes/run';
 import { welcomeScene } from './scenes/welcome';
 import { buildProgress, wireHeader } from './ui/chrome';
 import { $ } from './ui/dom';
 
-document.body.classList.toggle('debug', new URLSearchParams(location.search).has('debug'));
+const debug = new URLSearchParams(location.search).has('debug');
+document.body.classList.toggle('debug', debug);
+// Test/QA hook, present only with ?debug.
+if (debug) Object.assign(window, { __lpc: { go, session } });
 
 register(-1, coinScene);
 register(0, welcomeScene);
+register(1, guestsScene);
+register(2, runScene);
 
 buildProgress((scene) => go(scene));
 wireHeader();

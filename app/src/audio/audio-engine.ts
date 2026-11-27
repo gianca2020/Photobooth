@@ -6,9 +6,14 @@ const active = new Set<AudioScheduledSourceNode>();
 
 export const isEnabled = (): boolean => enabled;
 
+// Things that play outside the AudioContext (e.g. an <audio> element) register here to be silenced on mute.
+const disableListeners = new Set<() => void>();
+export const onDisable = (fn: () => void): void => void disableListeners.add(fn);
+
 export function setEnabled(on: boolean): void {
   enabled = on;
   if (!on) {
+    disableListeners.forEach((fn) => fn());
     for (const node of active) {
       try { node.stop(); } catch { /* already stopped */ }
     }

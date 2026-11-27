@@ -2,4 +2,12 @@
 export const art = {
   coinSheet: '/art/coin-sheet.png',
   welcomeSheet: '/art/welcome-sheet.png',
+  guests: [1, 2, 3, 4].map((n) => `/art/guests/guests-${n}.png`),
+  run: {
+    booth: '/art/run/booth.png',
+    open: '/art/run/booth-open.png',
+    runners: [1, 2, 3, 4].map((n) => `/art/run/runner-${n}.png`),
+  },
 } as const;
+
+export const audioFiles = { guestPop: '/audio/guest-pop.wav' } as const;
