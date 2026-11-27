@@ -11,6 +11,7 @@ import { clamp } from '../camera/lenses/util';
 import { drawSource, demoImage } from '../camera/source';
 import * as webcam from '../camera/webcam';
 import { sleep } from '../engine/clock';
+import { setupLiveGraffiti } from '../graffiti/live';
 import { drawShot, toPhoto } from '../photo/compose';
 import type { LensId } from '../app/state';
 import { $ } from '../ui/dom';
@@ -36,6 +37,8 @@ let capturing = false;
 let previewPose = 0;
 let fxRAF = 0;
 let lastFX = 0;
+
+const liveGraffiti = setupLiveGraffiti(() => capturing);
 
 const live = (): boolean => webcam.isLive();
 const active = (): boolean => !!signal && !signal.aborted;
@@ -204,6 +207,7 @@ function renderDots(taken: number): void {
 }
 
 function resetCapture(): void {
+  liveGraffiti.reset();
   resetFacePlacement();
   capturing = false;
   clearShots();
@@ -317,7 +321,7 @@ $('auto-face').onclick = () => {
   updateEffects();
 };
 viewfinder.addEventListener('click', (e) => {
-  if (!isFaceLens(session.lens) || capturing) return;
+  if (!isFaceLens(session.lens) || capturing || liveGraffiti.isDrawing()) return;
   const r = viewfinder.getBoundingClientRect();
   faces.place(clamp((e.clientX - r.left) / r.width, 0, 1), clamp((e.clientY - r.top) / r.height, 0, 1), session.count, live());
   faceNote();

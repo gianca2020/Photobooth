@@ -90,6 +90,46 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
   await run(1000);
   await settle();
   await shot('email');
+  // Live graffiti (Phase 3c): a fresh visit to the camera scene, drawn with real mouse input.
+  await page.evaluate(() => { go(3, false); });
+  await run(500);
+  await settle();
+  const pad = await page.locator('#live-graffiti').boundingBox();
+  const padPoint = ([fx, fy]) => [pad.x + pad.width * fx, pad.y + pad.height * fy];
+  const stroke = async (points) => {
+    await page.mouse.move(...padPoint(points[0]));
+    await page.mouse.down();
+    for (const p of points.slice(1)) await page.mouse.move(...padPoint(p), { steps: 6 });
+    await page.mouse.up();
+  };
+  await page.click('#live-toggle');
+  await shot('camera-graffiti-on');
+  await page.click('#live-pen');
+  await page.click('[data-livecolor="#f66b00"]');
+  await page.selectOption('#live-size', '6');
+  await stroke([[0.1, 0.2], [0.3, 0.5], [0.6, 0.3], [0.85, 0.6]]);
+  await shot('camera-graffiti-pen');
+  await page.click('#live-stamps');
+  await shot('camera-graffiti-palette');
+  await page.click('[data-livecolor="#171717"]');
+  await page.click('[data-livestamp="star"]');
+  await page.mouse.click(...padPoint([0.25, 0.75]));
+  await shot('camera-graffiti-stamp');
+  await page.click('#live-eraser');
+  await stroke([[0.05, 0.4], [0.95, 0.45]]);
+  await shot('camera-graffiti-erase');
+  await page.click('#live-undo');
+  await shot('camera-graffiti-undo');
+  await page.click('#live-clear');
+  await shot('camera-graffiti-clear');
+  await page.click('#live-stamps');
+  await page.click('[data-livecolor="#ffffff"]');
+  await page.click('[data-livestamp="heart"]');
+  await page.selectOption('#live-size', '4');
+  await page.mouse.click(...padPoint([0.5, 0.5]));
+  await page.click('#take');
+  await run(1500);
+  await shot('camera-graffiti-count');
   await ctx.close();
 }
 await browser.close();
