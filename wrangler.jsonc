@@ -5,5 +5,8 @@
   // Assets-only Worker: serves the Vite build. No server code until/unless an API route is added.
   "assets": {
     "directory": "./dist"
-  }
+  },
+  // Required by `wrangler preview`, which Cloudflare runs for pull-request branches. Empty is fine:
+  // assets and compatibility settings stay at the top level.
+  "previews": {}
 }
