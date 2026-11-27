@@ -5,7 +5,7 @@ import { session } from '../app/state';
 import { printFoley, sfx } from '../audio/foley';
 import { runPrint, showLanded } from '../dispenser/print';
 import { setupEditor } from '../graffiti/editor';
-import { stripHTML } from '../photo/strip';
+import { stripHTML, syncFormatButtons } from '../photo/strip';
 import { $, prefersReducedMotion } from '../ui/dom';
 
 const card = $<HTMLButtonElement>('fall');
@@ -25,10 +25,7 @@ const stopPrint = (): void => {
 /** Show the finished photos in the current format and mark the matching format button on the delivery scene. */
 function updateFormat(): void {
   $('photo-display').innerHTML = stripHTML(session);
-  document.querySelectorAll<HTMLElement>('[data-format]').forEach((b) => {
-    b.classList.toggle('selected', b.dataset.format === session.format);
-    b.setAttribute('aria-pressed', String(b.dataset.format === session.format));
-  });
+  syncFormatButtons(session);
 }
 
 const editor = setupEditor(session, updateFormat);

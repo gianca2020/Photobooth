@@ -1,3 +1,10 @@
 /* Production-only rules layered on the verbatim Draft 27 CSS. */
 /* Prototype chrome (scene dots, back link, DRAFT tag) is hidden unless the URL has ?debug. */
 body:not(.debug) .footer{display:none}
+
+/* Guest names, printed under the brand line on the strip (approved addition to Draft 27). Same type as .strip-footer. */
+.strip-names{font:10px var(--marker);text-align:center;line-height:1.1;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.photo-strip.grid .strip-names{grid-column:span 2}
+#s4 .dispenser-mouth .fall .strip-names{font-size:clamp(3px,2.25cqh,6px);line-height:1}
+#s4 .photo-display .photo-strip .strip-names{font-size:12px}
+@media(max-width:740px){#s4 .photo-display .photo-strip .strip-names{font-size:10px}}
