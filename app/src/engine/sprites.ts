@@ -3,9 +3,11 @@ export const FRAME_W = 256;
 export const FRAME_H = 192;
 const COLS = 5;
 
+/** Start loading a picture now, and decode it as soon as it arrives so the first draw doesn't stall. */
 export function loadImage(src: string): HTMLImageElement {
   const img = new Image();
   img.src = src;
+  img.decode().catch(() => {}); // a failed decode just means it is decoded on first use, as before
   return img;
 }
 
