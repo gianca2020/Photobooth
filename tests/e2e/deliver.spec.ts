@@ -44,6 +44,12 @@ const savedImage = (page: Page, index = 0) =>
 
 test.describe('the screen', () => {
   test('Save replaces the email form: no inputs, no prototype note; Share is hidden when the browser cannot share files', async ({ page }) => {
+    await page.addInitScript(() => {
+      // Pin the "cannot share files" case, whatever the browser under test supports (Safari's engine can).
+      Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true });
+    });
+    await page.reload({ waitUntil: 'load' });
+    await page.clock.pauseAt(20_000);
     await toDeliver(page);
     await expect(page.locator('#s5 h2').first()).toHaveText('Special delivery!');
     await expect(page.locator('#download')).toHaveText('Save the photos!');

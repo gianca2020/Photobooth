@@ -29,6 +29,20 @@ const sound = (page: Page) => page.evaluate(() => (window as unknown as { __snd:
 const card = (page: Page) => page.locator('#fall');
 const toReveal = (page: Page, animate: boolean, count = 2) =>
   page.evaluate(([a, c]) => { window.__lpc.session.count = c as number; window.__lpc.go(4, a as boolean); }, [animate, count]);
+/**
+ * Click, and keep clicking until `until` holds, like a person tapping again. On a loaded machine a button can still
+ * be sliding into place (the layout changes when the editor or the decision opens), and a press that starts on one
+ * spot and ends on another is not a click.
+ */
+async function clickUntil(page: Page, selector: string, until: () => Promise<void>) {
+  await expect(async () => {
+    await page.click(selector, { timeout: 5_000 });
+    await until();
+  }).toPass({ timeout: 20_000, intervals: [100, 300, 600] });
+}
+const shown = (page: Page, sel: string) => () => expect(page.locator(sel)).toBeVisible({ timeout: 1_500 });
+const sceneIs = (page: Page, id: string) => () => expect.poll(() => page.evaluate(() => document.querySelector('.scene.active')?.id), { timeout: 1_500 }).toBe(id);
+
 /** Print finishes 3 s after it starts (650 ms later when sliding in); run past that and pick up the strip. */
 async function printAndPickUp(page: Page) {
   await page.clock.runFor(4000);
@@ -39,12 +53,12 @@ test.describe('dispenser', () => {
   test('the strip is not clickable while printing, and says so; it is when it has landed', async ({ page }) => {
     await toReveal(page, false);
     await expect(card(page)).toBeDisabled();
-    await expect(card(page)).toHaveAttribute('aria-label', 'Printing your photo strip');
+    await expect(card(page)).toHaveAttribute('aria-label', 'Printing your photo strip, little photo club');
     await page.clock.runFor(2900);
     await expect(card(page)).toBeDisabled(); // 36 frames = 3 s
     await page.clock.runFor(200);
     await expect(card(page)).toBeEnabled();
-    await expect(card(page)).toHaveAttribute('aria-label', 'Pick up your photo strip');
+    await expect(card(page)).toHaveAttribute('aria-label', 'Pick up your photo strip, little photo club');
   });
 
   test('sliding in waits 650 ms before printing; the foley starts with the first frame, not before', async ({ page }) => {
@@ -140,7 +154,7 @@ test.describe('reveal and decision', () => {
     await toReveal(page, false);
     await printAndPickUp(page);
     await expect(page.locator('#decision')).toBeHidden();
-    await page.click('#review-next');
+    await clickUntil(page, '#review-next', shown(page, '#decision'));
     await expect(page.locator('#decision')).toBeVisible();
     await expect(page.locator('#review-next')).toBeHidden();
     await expect(page.locator('#reveal-full')).toHaveClass(/deciding/);
@@ -150,14 +164,14 @@ test.describe('reveal and decision', () => {
   test('Keep it goes to delivery; Retake goes back to the camera and clears the photos', async ({ page }) => {
     await toReveal(page, false);
     await printAndPickUp(page);
-    await page.click('#review-next');
-    await page.click('#send-next');
+    await clickUntil(page, '#review-next', shown(page, '#decision'));
+    await clickUntil(page, '#send-next', sceneIs(page, 's5'));
     expect(await page.evaluate(() => document.querySelector('.scene.active')?.id)).toBe('s5');
 
     await toReveal(page, false);
     await printAndPickUp(page);
-    await page.click('#review-next');
-    await page.click('#retake');
+    await clickUntil(page, '#review-next', shown(page, '#decision'));
+    await clickUntil(page, '#retake', sceneIs(page, 's3'));
     expect(await page.evaluate(() => document.querySelector('.scene.active')?.id)).toBe('s3');
     expect(await page.evaluate(() => window.__lpc.session.shots.length)).toBe(0);
   });
@@ -165,7 +179,7 @@ test.describe('reveal and decision', () => {
   test('coming back to the dispenser resets the reveal (decision closed, strip printing again)', async ({ page }) => {
     await toReveal(page, false);
     await printAndPickUp(page);
-    await page.click('#review-next');
+    await clickUntil(page, '#review-next', shown(page, '#decision'));
     await toReveal(page, false);
     await expect(page.locator('#reveal-full')).toBeHidden();
     await expect(page.locator('#decision')).toBeHidden();
@@ -179,7 +193,7 @@ test.describe('reveal and decision', () => {
 async function openEditor(page: Page) {
   await toReveal(page, false);
   await printAndPickUp(page);
-  await page.click('#graffiti-open');
+  await clickUntil(page, '#graffiti-open', shown(page, '#graffiti-editor'));
   await page.waitForTimeout(600); // the dialog slides in on real time; wait so the canvas stops moving
 }
 const inkXY = async (page: Page, lx: number, ly: number): Promise<[number, number]> => {
@@ -291,7 +305,7 @@ test.describe('graffiti editor', () => {
     await expect(page.locator('#graffiti-editor')).toBeHidden();
     await expect(page.locator('#graffiti-open')).toBeFocused();
     expect(await page.evaluate(() => window.__lpc.session.shots.filter(Boolean).length)).toBe(0);
-    await page.click('#graffiti-open');
+    await clickUntil(page, '#graffiti-open', shown(page, '#graffiti-editor'));
     await page.waitForTimeout(600);
     expect(await inked(page)).toBe(0); // reopening starts clean
     await page.keyboard.press('Escape');
@@ -340,7 +354,7 @@ test.describe('graffiti editor', () => {
     await page.click('#graffiti-done');
     await expect(page.locator('#graffiti-editor')).toBeHidden();
     const first = await page.evaluate(() => window.__lpc.session.shots[0]!.url);
-    await page.click('#graffiti-open');
+    await clickUntil(page, '#graffiti-open', shown(page, '#graffiti-editor'));
     await page.waitForTimeout(600);
     await tap(page, 100, 100);
     await page.click('#graffiti-done');

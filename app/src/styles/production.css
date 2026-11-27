@@ -8,3 +8,6 @@ body:not(.debug) .footer{display:none}
 #s4 .dispenser-mouth .fall .strip-names{font-size:clamp(3px,2.25cqh,6px);line-height:1}
 #s4 .photo-display .photo-strip .strip-names{font-size:12px}
 @media(max-width:740px){#s4 .photo-display .photo-strip .strip-names{font-size:10px}}
+
+/* The LIVE / DEMO VIEW tag is only a label. It sits above the live-graffiti canvas, so it used to swallow taps that began under it. */
+#s3 .rec{pointer-events:none}

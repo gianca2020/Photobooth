@@ -10,7 +10,8 @@ export function stripHTML(session: Session, format: PhotoFormat = session.format
     return `<div class="shot">${shot ? `<img alt="Photo ${i + 1}" src="${shot.url}">` : `<img alt="Demo photo ${i + 1}" src="${demoImage(session.count, i).src}">`}</div>`;
   });
   const names = namesLine(session);
-  return `<div class="photo-strip ${format === 'grid' ? 'grid' : ''}">${shots.join('')}<div class="strip-footer">little photo \u2733 club</div>${names ? `<div class="strip-names">${escapeHTML(names)}</div>` : ''}</div>`;
+  // The newline between the two lines is invisible (a grid ignores whitespace) but keeps their words apart for assistive tech.
+  return `<div class="photo-strip ${format === 'grid' ? 'grid' : ''}">${shots.join('')}<div class="strip-footer">little photo \u2733 club</div>${names ? `\n<div class="strip-names">${escapeHTML(names)}</div>` : ''}</div>`;
 }
 
 /** Mark the 4-strip / 2x2 buttons on the delivery scene to match the session. */

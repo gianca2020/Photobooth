@@ -51,13 +51,22 @@ export const revealScene: Scene = {
     full.classList.add('hidden');
 
     card.innerHTML = stripHTML(session, 'strip');
+    // The button's name must contain the words printed on it (WCAG 2.5.3: label in name). Decoration (the star,
+    // the dots between names) is left out: assistive tech skips it in the visible text, so it can't be in the name.
+    const printed = [...card.querySelectorAll('.strip-footer, .strip-names')]
+      .map((e) => e.textContent)
+      .join(' ')
+      .replace(/[\u2733\u00b7]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const label = (what: string): string => `${what}, ${printed}`;
     card.disabled = true;
-    card.setAttribute('aria-label', 'Printing your photo strip');
+    card.setAttribute('aria-label', label('Printing your photo strip'));
     card.style.transform = 'translate(-50%,-110%)';
 
     const landed = () => {
       card.disabled = false;
-      card.setAttribute('aria-label', 'Pick up your photo strip');
+      card.setAttribute('aria-label', label('Pick up your photo strip'));
     };
     if (prefersReducedMotion()) {
       showLanded(card, mouth);
