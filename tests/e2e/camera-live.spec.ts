@@ -79,7 +79,8 @@ test('leaving while the permission prompt is still open never leaves the camera 
 test('every lens renders live video without errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
-  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  // MediaPipe reports an informational line through console.error; real errors still fail the test.
+  page.on('console', (m) => m.type() === 'error' && !m.text().startsWith('INFO:') && errors.push(m.text()));
   await open(page);
   await goCamera(page);
   await expect(page.locator('#rec')).toHaveText('LIVE');
@@ -102,7 +103,6 @@ test('tapping places a face manually; "Auto faces" clears it', async ({ page }) 
   await goCamera(page);
   await expect(page.locator('#rec')).toHaveText('LIVE');
   await page.click('[data-filter="mischief"]');
-  await expect(page.locator('#filter-note')).toContainText('Tracking unavailable; tap to aim');
   await page.locator('#s3 .viewfinder').click({ position: { x: 200, y: 150 } });
   await expect(page.locator('#filter-note')).toContainText('Manual placement');
   await page.click('#auto-face');
@@ -122,4 +122,81 @@ test('a live capture produces four 960x720 photos', async ({ page }) => {
   })));
   expect(dims).toEqual([[960, 720], [960, 720], [960, 720], [960, 720]]);
   expect(await tracksEnded(page)).toBe(true); // leaving the camera scene released it
+});
+
+
+// ---- face detection (3b) ------------------------------------------------------------------
+
+const note = (page: Page) => page.locator('#filter-note');
+/** Let the paused clock tick (rAF drives detection) until the note matches. */
+async function tickUntilNote(page: Page, text: string, timeout = 20_000) {
+  await expect
+    .poll(async () => { await page.clock.runFor(250); return (await note(page).textContent()) ?? ''; }, { timeout })
+    .toContain(text);
+}
+
+test('MediaPipe loads from our own domain, only once a face lens is chosen', async ({ page }) => {
+  const hosts = new Set<string>();
+  const paths: string[] = [];
+  page.on('request', (r) => { const u = new URL(r.url()); hosts.add(u.host); paths.push(u.pathname); });
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('[data-filter="flipnote"]'); // not a face lens
+  await page.clock.runFor(1000);
+  expect(paths.some((p) => p.includes('/models/'))).toBe(false);
+
+  await page.click('[data-filter="mischief"]');
+  await tickUntilNote(page, 'Looking for faces'); // loaded fine, the fake video just has no face
+  expect(paths).toContain('/models/blaze_face_short_range.tflite');
+  expect(paths).toContain('/models/mediapipe/wasm/vision_wasm_internal.wasm');
+  const outside = [...hosts].filter((h) => !/^(localhost:\d+|fonts\.googleapis\.com|fonts\.gstatic\.com)$/.test(h));
+  expect(outside).toEqual([]);
+});
+
+test('a detected face is tracked, tapping overrides it, "Auto faces" gives control back', async ({ page }) => {
+  await page.addInitScript(() => {
+    // The browser's built-in detector API, stubbed: always sees one face. Exercises the whole path.
+    const w = window as unknown as { FaceDetector: unknown; __detects: number };
+    w.__detects = 0;
+    w.FaceDetector = class {
+      async detect(c: HTMLCanvasElement) {
+        if (c.width === 320) w.__detects++; // real frames only, not the start-up probe
+        return [{ boundingBox: { x: 110, y: 70, width: 100, height: 110 } }];
+      }
+    };
+  });
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('[data-filter="warp"]');
+  await tickUntilNote(page, '1 face tracked');
+  await page.locator('#s3 .viewfinder').click({ position: { x: 150, y: 120 } });
+  await expect(note(page)).toContainText('Manual placement');
+  const detects = () => page.evaluate(() => (window as unknown as { __detects: number }).__detects);
+  await page.clock.runFor(300);
+  const before = await detects();
+  await page.clock.runFor(2000);
+  await expect(note(page)).toContainText('Manual placement');
+  expect(await detects()).toBe(before); // no wasted detection while the guest is aiming
+  await page.click('#auto-face');
+  await tickUntilNote(page, '1 face tracked');
+});
+
+test('if the model cannot load: tap-to-aim message, manual placement still works, next visit retries', async ({ page }) => {
+  let block = true;
+  await page.route('**/models/**', (route) => (block ? route.abort() : route.continue()));
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('[data-filter]:nth-child(3)'); // mischief
+  await tickUntilNote(page, 'Tracking unavailable; tap to aim');
+  await page.locator('#s3 .viewfinder').click({ position: { x: 150, y: 120 } });
+  await expect(note(page)).toContainText('Manual placement');
+
+  block = false; // connection is back
+  await page.evaluate(() => window.__lpc.go(1, false));
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await tickUntilNote(page, 'Looking for faces');
 });

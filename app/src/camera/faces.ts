@@ -1,22 +1,47 @@
 // Where the faces are. Priority: faces the guest placed by tapping, then tracked faces (live camera),
-// then fixed positions that match the demo artwork. Automatic detection arrives in the next PR;
-// until then the live camera reports "Tracking unavailable; tap to aim", which is Draft 27's own wording.
+// then fixed positions that match the demo artwork. Detection itself lives in tracker.ts/detector.ts.
 import { clamp } from './lenses/util';
 import type { Face } from './types';
 
-export type TrackingStatus = 'loading' | 'failed' | 'ready';
+export type TrackingStatus = 'idle' | 'loading' | 'ready' | 'failed';
 
 let tracked: Face[] = [];
 let manual: Face[] = [];
-let status: TrackingStatus = 'failed';
+let status: TrackingStatus = 'idle';
+let lastFaceTime = 0;
+let generation = 0;
 
 export const getTracked = (): Face[] => tracked;
 export const getManual = (): Face[] => manual;
 export const getStatus = (): TrackingStatus => status;
+export const setStatus = (s: TrackingStatus): void => void (status = s);
+/** Bumped by reset(); in-flight detections from an older generation are thrown away. */
+export const getGeneration = (): number => generation;
 
 export function reset(): void {
+  generation++;
   tracked = [];
   manual = [];
+  lastFaceTime = 0;
+}
+
+/** Fold a fresh detection into the tracked faces: ease toward matches (less jitter), keep up to 4, forget after 0.8 s of nothing. */
+export function setTracked(found: Face[], now: number): void {
+  if (found.length) {
+    const prev = tracked;
+    tracked = found.slice(0, 4).map((f) => {
+      const old = prev.find((o) => Math.hypot(o.x - f.x, o.y - f.y) < 0.1);
+      if (!old) return f;
+      return { x: old.x * 0.35 + f.x * 0.65, y: old.y * 0.35 + f.y * 0.65, w: old.w * 0.35 + f.w * 0.65, h: old.h * 0.35 + f.h * 0.65 };
+    });
+    lastFaceTime = now;
+  } else if (now - lastFaceTime > 800) {
+    tracked = [];
+  }
+}
+
+export function clearTracked(): void {
+  tracked = [];
 }
 
 // Where the guests are drawn in the demo art, per guest count (x, y, w, h).

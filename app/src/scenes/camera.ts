@@ -5,6 +5,7 @@ import { go, type Scene } from '../app/router';
 import { clearShots, session } from '../app/state';
 import { sfx } from '../audio/foley';
 import * as faces from '../camera/faces';
+import { detectFaces, retryAfterFailure } from '../camera/tracker';
 import { LENS_NOTES, LENS_TITLES, LENS_VARIANTS, applyLens, filterSize, isFaceLens, isVariantLens } from '../camera/lenses';
 import { clamp } from '../camera/lenses/util';
 import { drawSource, demoImage } from '../camera/source';
@@ -134,12 +135,19 @@ function paintEffect(pose: number): boolean {
   return true;
 }
 
+const trackerHooks = {
+  draw: (g: CanvasRenderingContext2D, w: number, h: number) => drawSource(g, video, w, h, session.count, previewPose),
+  wanted: () => active() && live() && isFaceLens(session.lens) && video.videoWidth > 0,
+  changed: faceNote,
+};
+
 function effectLoop(t: number): void {
   fxRAF = 0;
   if (!active() || session.lens === 'classic') return;
   if (t - lastFX >= 66) {
     lastFX = t;
     paintEffect(previewPose);
+    if (isFaceLens(session.lens)) void detectFaces(t, trackerHooks);
   }
   fxRAF = requestAnimationFrame(effectLoop);
 }
@@ -263,6 +271,7 @@ async function capture(): Promise<void> {
 export const cameraScene: Scene = {
   enter(ctx) {
     signal = ctx.signal;
+    retryAfterFailure();
     resetCapture();
     if (!live()) void enableCamera();
   },
