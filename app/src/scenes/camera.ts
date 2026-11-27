@@ -319,7 +319,7 @@ $('auto-face').onclick = () => {
 viewfinder.addEventListener('click', (e) => {
   if (!isFaceLens(session.lens) || capturing) return;
   const r = viewfinder.getBoundingClientRect();
-  faces.place(clamp((e.clientX - r.left) / r.width, 0, 1), clamp((e.clientY - r.top) / r.height, 0, 1), session.count);
+  faces.place(clamp((e.clientX - r.left) / r.width, 0, 1), clamp((e.clientY - r.top) / r.height, 0, 1), session.count, live());
   faceNote();
   paintEffect(previewPose);
 });
