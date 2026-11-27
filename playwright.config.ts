@@ -3,7 +3,8 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: 'tests/e2e',
   // Baselines are screenshots of reference/draft27.html (see tools/capture-reference.mjs).
-  snapshotPathTemplate: 'tests/visual/baseline/{arg}{ext}',
+  // BASELINE_DIR lets CI compare against a reference captured on the same OS (see .github/workflows/ci.yml).
+  snapshotPathTemplate: `${process.env.BASELINE_DIR ?? 'tests/visual/baseline'}/{arg}{ext}`,
   webServer: {
     command: 'npx vite --port 5391 --strictPort',
     url: 'http://localhost:5391',
