@@ -4,9 +4,6 @@ import { expect, test } from '@playwright/test';
 
 const viewports = { desktop: { width: 1280, height: 800 }, phone: { width: 390, height: 844 } };
 
-declare global {
-  interface Window { __lpc: { go: (i: number, animate?: boolean) => void; session: { count: number } } }
-}
 
 for (const [name, viewport] of Object.entries(viewports)) {
   test(`guests and run-in match Draft 27 (${name})`, async ({ browser, baseURL }) => {
