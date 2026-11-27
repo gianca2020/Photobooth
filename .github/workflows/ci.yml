@@ -28,7 +28,8 @@ jobs:
         run: npx wrangler deploy --dry-run
         env:
           WRANGLER_SEND_METRICS: 'false'
-      - run: npx playwright install --with-deps chromium
+      # Chromium for parity, WebKit (Safari's engine) and Firefox for the behaviour tests (see playwright.config.ts).
+      - run: npx playwright install --with-deps chromium webkit firefox
       # Text rendering differs between macOS and Linux, so compare against Draft 27 as rendered
       # on this same runner rather than against screenshots committed from a Mac.
       - name: Capture Draft 27 reference on this runner

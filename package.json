@@ -15,6 +15,7 @@
     "cf:dry-run": "npm run build && wrangler deploy --dry-run"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.1",
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.11",
     "typescript": "^7.0.2",

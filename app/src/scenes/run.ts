@@ -5,13 +5,16 @@ import { go, type Scene } from '../app/router';
 import { session } from '../app/state';
 import { art } from '../assets/manifest';
 import { FPS, FRAME_MS, timeout } from '../engine/clock';
-import { isReady, loadImage } from '../engine/sprites';
+import { isReady, loadImage, whiteSilhouette } from '../engine/sprites';
 import { $, prefersReducedMotion } from '../ui/dom';
 
 const INK = '#171717';
 const booth = loadImage(art.run.booth);
 const boothOpen = loadImage(art.run.open);
 const sprites = art.run.runners.map(loadImage);
+
+// Safari's canvas has no `filter`; there the white outline is built from compositing instead (same pixels).
+const CANVAS_FILTER = 'filter' in CanvasRenderingContext2D.prototype;
 
 const BX = 220, BY = 8, GROUND = 116, DOOR_X = 291, SPACING = 49, SPEED = 6, START_X = -24;
 const OFFSETS = [0, -3, -9, -7, -2, 0];
@@ -74,9 +77,14 @@ export const runScene: Scene = {
           g.beginPath();
           g.rect(BX + 42, BY + 43, 44, 69);
           g.clip();
-          g.filter = 'brightness(0) invert(1)';
-          for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) draw(sprite, left + dx, top + dy, w, h);
-          g.filter = 'none';
+          if (CANVAS_FILTER) {
+            g.filter = 'brightness(0) invert(1)';
+            for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) draw(sprite, left + dx, top + dy, w, h);
+            g.filter = 'none';
+          } else if (isReady(sprite)) {
+            const white = whiteSilhouette(sprite, w, h);
+            for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) g.drawImage(white, left + dx, top + dy);
+          }
           draw(sprite, left, top, w, h);
           g.restore();
         }

@@ -61,6 +61,24 @@ test('starts off; the Graffiti button opens the tools and closes them again', as
   await expect(page.locator('#s3 .viewfinder')).not.toHaveClass(/live-drawing/);
 });
 
+test('with graffiti on, nothing covers the drawing layer: every point of it receives the pointer', async ({ page }) => {
+  await on(page);
+  for (const vp of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(vp);
+    const covered = await page.evaluate(() => {
+      const c = document.getElementById('live-graffiti')!;
+      const r = c.getBoundingClientRect();
+      const blockers: string[] = [];
+      for (let fx = 0.01; fx < 1; fx += 0.04) for (let fy = 0.01; fy < 1; fy += 0.04) {
+        const e = document.elementFromPoint(r.left + r.width * fx, r.top + r.height * fy)!;
+        if (e !== c) blockers.push(`${e.tagName}#${e.id}`);
+      }
+      return blockers;
+    });
+    expect(covered, `${vp.width}px wide`).toEqual([]);
+  }
+});
+
 test('with graffiti off the canvas ignores the mouse', async ({ page }) => {
   await tap(page, 100, 100);
   expect(await inked(page)).toBe(0);
@@ -108,12 +126,16 @@ test('eraser punches a hole three times the pen size, and only where you drag', 
   expect(await pressed(page, '#live-eraser')).toBe('true');
   expect(await pressed(page, '#live-pen')).toBe('false');
   await tap(page, 100, 100);
-  expect(await pixel(page, 100, 100)).toEqual([0, 0, 0, 0]);
-  // 18 px hole: x 91..108
-  expect(await pixel(page, 108, 100)).toEqual([0, 0, 0, 0]);
-  expect(await pixel(page, 91, 100)).toEqual([0, 0, 0, 0]);
-  expect(await pixel(page, 109, 100)).toEqual(INK);
-  expect(await pixel(page, 90, 100)).toEqual(INK);
+  // The hole is 18 px wide (3 x the pen) and as tall as the 6 px bar. Where exactly it lands can be one layer
+  // pixel off on a phone-sized canvas (a tap is rounded to whole screen pixels), so find it instead of assuming.
+  const hole = await page.evaluate(() => {
+    const d = (document.getElementById('live-graffiti') as HTMLCanvasElement).getContext('2d')!.getImageData(0, 100, 256, 1).data;
+    let left = -1, right = -1;
+    for (let x = 21; x < 199; x++) if (d[x * 4 + 3] === 0) { if (left < 0) left = x; right = x; }
+    return { left, right };
+  });
+  expect(hole.right - hole.left + 1).toBe(18);
+  expect(Math.abs((hole.left + hole.right) / 2 - 100)).toBeLessThanOrEqual(1.5);
   expect(before - (await inked(page))).toBe(18 * 6); // the bar is 6 tall: 18 wide x 6 tall removed
 });
 
