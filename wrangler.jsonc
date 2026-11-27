@@ -6,9 +6,9 @@
   "assets": {
     "directory": "./dist"
   },
-  // Required by `wrangler preview`, which Cloudflare runs for pull-request branches. Empty is fine:
-  // assets and compatibility settings stay at the top level.
   // Wrangler builds dist/ itself, so Cloudflare builds work even if the dashboard build command is empty.
   "build": { "command": "npm run build" },
+  // Required by `wrangler preview`, which Cloudflare runs for pull-request branches. Empty is fine:
+  // assets and compatibility settings stay at the top level.
   "previews": {}
 }
