@@ -196,6 +196,48 @@ test('a detected face is tracked, tapping overrides it, "Auto faces" gives contr
   await tickUntilNote(page, '1 face tracked');
 });
 
+/** Is the middle of the left glasses lens (just above the nose line) solid ink on the 640x480 effect canvas? */
+async function glassesOnEyeLine(page: Page, withLandmarks: boolean): Promise<boolean> {
+  await page.addInitScript((landmarks) => {
+    // Face box in the 320x240 detection frame: centre (160, 125). The eyes are at y=100, well above the old glasses.
+    (window as unknown as { FaceDetector: unknown }).FaceDetector = class {
+      async detect(c: HTMLCanvasElement) {
+        const face: Record<string, unknown> = { boundingBox: { x: 110, y: 70, width: 100, height: 110 } };
+        if (landmarks && c.width === 320) {
+          face.landmarks = [
+            { type: 'eye', locations: [{ x: 135, y: 100 }] },
+            { type: 'eye', locations: [{ x: 185, y: 100 }] },
+            { type: 'nose', locations: [{ x: 160, y: 130 }] },
+            { type: 'mouth', locations: [{ x: 160, y: 150 }] },
+          ];
+        }
+        return [face];
+      }
+    };
+  }, withLandmarks);
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('[data-filter="mischief"]');
+  await page.click('#variant-buttons button[data-variant="glasses"]');
+  await tickUntilNote(page, '1 face tracked');
+  await page.clock.runFor(500);
+  return page.evaluate(() => {
+    const c = document.getElementById('ink-preview') as HTMLCanvasElement;
+    const d = c.getContext('2d')!.getImageData(262, 185, 28, 30).data; // right of the white glint, around y = 200 (eye line)
+    for (let i = 0; i < d.length; i += 4) if (d[i] !== 23 || d[i + 1] !== 23 || d[i + 2] !== 23) return false;
+    return true;
+  });
+}
+
+test('Mischief glasses sit on the eyes the detector reports (landmarks)', async ({ page }) => {
+  expect(await glassesOnEyeLine(page, true)).toBe(true);
+});
+
+test('Mischief glasses fall back to Draft 27 placement when the detector reports no landmarks', async ({ page }) => {
+  expect(await glassesOnEyeLine(page, false)).toBe(false); // old offset: the lens starts lower, below the eye line
+});
+
 test('if the model cannot load: tap-to-aim message, manual placement still works, next visit retries', async ({ page }) => {
   let block = true;
   await page.route('**/models/**', (route) => (block ? route.abort() : route.continue()));
