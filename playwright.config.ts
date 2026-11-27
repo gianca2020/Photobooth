@@ -13,5 +13,18 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:5391', deviceScaleFactor: 1 },
   // 2 of 42 baseline shots vary by a few pixels between identical runs of the reference itself.
   expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.0005 } },
-  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+  projects: [
+    // Demo-mode and pixel-parity tests: no camera is ever available.
+    { name: 'chromium', testIgnore: '**/camera-live.spec.ts', use: { browserName: 'chromium' } },
+    // Tests that need a (fake) webcam stream.
+    {
+      name: 'chromium-fake-camera',
+      testMatch: '**/camera-live.spec.ts',
+      use: {
+        browserName: 'chromium',
+        permissions: ['camera'],
+        launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] },
+      },
+    },
+  ],
 });

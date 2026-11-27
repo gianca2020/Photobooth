@@ -53,6 +53,30 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
   await run(10000);
   await settle();
   await shot('camera-demo');
+  // Lenses (demo mode, 4 guests), driven by real clicks so the new app can replay the same steps.
+  for (const lens of ['classic', 'flipnote', 'mischief', 'warp', 'orange', '2009', 'emoter']) {
+    await page.click(`[data-filter="${lens}"]`);
+    await run(300);
+    await shot(`camera-lens-${lens}`);
+    const variant = { mischief: 'all', warp: 'wide', emoter: 'angry' }[lens];
+    if (variant) {
+      await page.click(`#variant-buttons button[data-variant="${variant}"]`);
+      await run(300);
+      await shot(`camera-lens-${lens}-${variant}`);
+    }
+  }
+  await page.click('[data-filter="classic"]');
+  await page.click('#frame-toggle');
+  await run(300);
+  await shot('camera-frame');
+  await page.click('#frame-toggle');
+  await run(300);
+  // Countdown: the number appears 1450 ms after "Take photos" and changes every second.
+  await page.click('#take');
+  await run(1500);
+  await shot('camera-count-3');
+  await run(1000);
+  await shot('camera-count-2');
   await page.evaluate(() => { go(4, false); });
   await settle();
   let pf = 0; // print timeline starts 0 ms after go(4) without the .enter delay

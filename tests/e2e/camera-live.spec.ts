@@ -1,0 +1,125 @@
+// Tests that need a webcam stream (Chromium's fake device). Run by the "chromium-fake-camera" project.
+import { expect, test, type Page } from '@playwright/test';
+
+async function open(page: Page) {
+  await page.addInitScript(() => {
+    // Remember every stream the app gets so tests can check the tracks are released.
+    const w = window as unknown as { __streams: MediaStream[]; __release?: () => void };
+    w.__streams = [];
+    const real = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = async (c) => {
+      const stream = await real(c);
+      w.__streams.push(stream);
+      return stream;
+    };
+  });
+  await page.clock.install({ time: 0 });
+  await page.goto('/?debug', { waitUntil: 'load' });
+  await page.clock.pauseAt(10_000);
+}
+const goCamera = (page: Page) => page.evaluate(() => window.__lpc.go(3, false));
+const tracksEnded = (page: Page) =>
+  page.evaluate(() => (window as unknown as { __streams: MediaStream[] }).__streams.flatMap((s) => s.getTracks()).every((t) => t.readyState === 'ended'));
+const streamCount = (page: Page) => page.evaluate(() => (window as unknown as { __streams: MediaStream[] }).__streams.length);
+
+test('granted: shows live video, hides the demo art', async ({ page }) => {
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await expect(page.locator('#video')).toBeVisible();
+  await expect(page.locator('#demo')).toBeHidden();
+  await expect(page.locator('#webcam')).toHaveText('Use demo instead');
+  await expect(page.locator('#camera-status')).toHaveText('');
+  await expect(page.locator('#take')).toBeEnabled();
+  expect(await tracksEnded(page)).toBe(false);
+});
+
+test('"Use demo instead" releases the camera; "Use real camera" asks again', async ({ page }) => {
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('#webcam');
+  await expect(page.locator('#rec')).toHaveText('DEMO VIEW');
+  expect(await tracksEnded(page)).toBe(true);
+  await page.click('#webcam');
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  expect(await streamCount(page)).toBe(2);
+});
+
+test('leaving the scene releases the camera', async ({ page }) => {
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.evaluate(() => window.__lpc.go(1, false));
+  expect(await tracksEnded(page)).toBe(true);
+});
+
+test('leaving while the permission prompt is still open never leaves the camera on', async ({ page }) => {
+  await page.addInitScript(() => {
+    // Hold the answer back until the test says so (like a user staring at the permission prompt).
+    const w = window as unknown as { __streams: MediaStream[]; __answer: () => void };
+    const real = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    w.__streams = [];
+    navigator.mediaDevices.getUserMedia = (c) =>
+      new Promise((resolve, reject) => {
+        w.__answer = () => real(c).then((s) => { w.__streams.push(s); resolve(s); }, reject);
+      });
+  });
+  await page.clock.install({ time: 0 });
+  await page.goto('/?debug', { waitUntil: 'load' });
+  await page.clock.pauseAt(10_000);
+  await goCamera(page);
+  await expect(page.locator('#camera-status')).toHaveText('Waiting for camera permission…');
+  await page.evaluate(() => window.__lpc.go(1, false)); // guest walks away
+  await page.evaluate(() => (window as unknown as { __answer: () => void }).__answer()); // ...then grants
+  await expect.poll(() => streamCount(page)).toBe(1);
+  await expect.poll(() => tracksEnded(page)).toBe(true);
+});
+
+test('every lens renders live video without errors', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  for (const lens of ['flipnote', 'mischief', 'warp', 'orange', '2009', 'emoter', 'classic']) {
+    await page.click(`[data-filter="${lens}"]`);
+    await page.clock.runFor(300);
+    if (lens === 'classic') {
+      await expect(page.locator('#ink-preview')).toBeHidden();
+    } else {
+      await expect(page.locator('#ink-preview')).toBeVisible();
+      const size = await page.evaluate(() => { const c = document.getElementById('ink-preview') as HTMLCanvasElement; return [c.width, c.height]; });
+      expect(size).toEqual(lens === 'flipnote' ? [256, 192] : [640, 480]);
+    }
+  }
+  expect(errors).toEqual([]);
+});
+
+test('tapping places a face manually; "Auto faces" clears it', async ({ page }) => {
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('[data-filter="mischief"]');
+  await expect(page.locator('#filter-note')).toContainText('Tracking unavailable; tap to aim');
+  await page.locator('#s3 .viewfinder').click({ position: { x: 200, y: 150 } });
+  await expect(page.locator('#filter-note')).toContainText('Manual placement');
+  await page.click('#auto-face');
+  await expect(page.locator('#filter-note')).not.toContainText('Manual placement');
+});
+
+test('a live capture produces four 960x720 photos', async ({ page }) => {
+  await open(page);
+  await goCamera(page);
+  await expect(page.locator('#rec')).toHaveText('LIVE');
+  await page.click('#take');
+  await page.clock.runFor(21_000);
+  await expect.poll(() => page.evaluate(() => document.querySelector('.scene.active')?.id)).toBe('s4');
+  const dims = await page.evaluate(async () => Promise.all(window.__lpc.session.shots.map(async (s) => {
+    const b = await createImageBitmap(s!.blob);
+    return [b.width, b.height];
+  })));
+  expect(dims).toEqual([[960, 720], [960, 720], [960, 720], [960, 720]]);
+  expect(await tracksEnded(page)).toBe(true); // leaving the camera scene released it
+});
